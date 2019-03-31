@@ -120,12 +120,6 @@ contract BasicToken {
 }
 
 contract GameToken is BasicToken {
-    // creator of this contract
-    address internal _owner;
-
-    // only authorized game machine can consume and reward user token
-    mapping (address => bool) public _authorizdedMachines;
-
 
     // erc721
     struct Avatar {
@@ -134,6 +128,8 @@ contract GameToken is BasicToken {
       bool weaponed;
       bool armored;
     }
+    
+    address public _owner;
 
     uint constant internal MAXLEVEL= 2;
 
@@ -157,16 +153,6 @@ contract GameToken is BasicToken {
         _owner = msg.sender;
     }
 
-    modifier onlyOwner()  {
-        require(msg.sender == _owner);
-        _;
-    }
-
-    modifier onlyAuthorizedMachine()  {
-        require(_authorizdedMachines[msg.sender]);
-        _;
-    }
-
     function ownerOf(uint256 tokenId) external view returns (address) {
         address owner = _avatarOwner[tokenId];
         require(owner != address(0));
@@ -175,6 +161,13 @@ contract GameToken is BasicToken {
 
     function ownedAvatars(address owner) external view returns (uint256){
         return _ownedAvatars[owner];
+    }
+    
+    function avatarState(uint256 tokenId) external view returns (uint256,uint256,bool,bool) {
+        address owner = _avatarOwner[tokenId];
+        require(owner != address(0));
+        Avatar memory a = avatar[tokenId];
+        return (a.gene,a.avatarLevel,a.weaponed,a.armored);
     }
 
     function mint(address to, uint256 tokenId) external {
@@ -198,16 +191,16 @@ contract GameToken is BasicToken {
     function equipArmor(uint256 tokenId, address user) external {
         require(_avatarOwner[tokenId]==user);
         require(!avatar[tokenId].armored);
-        avatar[tokenId].armored = true;
+        avatar[tokenId].armored  = true;
     }
 
-    function reward(address to, uint256 value) public onlyAuthorizedMachine() returns (bool) {
+    function reward(address to, uint256 value) public returns (bool) {
         _transfer(msg.sender, to, value);
         emit Reward(msg.sender, to, value);
         return true;
     }
 
-    function consume(address by, uint256 value) public onlyAuthorizedMachine() returns (bool){
+    function consume(address by, uint256 value) public  returns (bool){
         _transfer(by, msg.sender, value);
         emit Consume(msg.sender, by, value);
         return true;
