@@ -1,0 +1,2 @@
+pbpaste | tr '
+' ' ' | sed 's//\/g' | tr '	' ' ' | pbcopy
