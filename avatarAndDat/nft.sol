@@ -7,10 +7,11 @@ contract DAT {
       string nftType;
       string nftName;
       string nftLdefIndex;
+      string distIndex;
       uint256 nftLifeIndex;
       uint256 nftPowerIndex;
       string nftCharacterId;
-      bytes32 publicKey;
+      bytes publicKey;
     }
     
     mapping (uint256 => address) private _tokenOwner;
@@ -38,10 +39,11 @@ contract DAT {
         string memory nft_type, 
         string memory nft_name,
         string memory nft_ldef_index,
+        string memory dist_index,
         uint256 nft_life_index, 
         uint256 nft_power_index,
         string memory nft_character_id, 
-        bytes32 public_key)  public {
+        bytes memory public_key)  public {
         require(to != address(0));
         require(!_exists(token_id));
         NFT memory m = NFT(
@@ -50,6 +52,7 @@ contract DAT {
                 nftName: nft_name,
                 nftLdefIndex: nft_ldef_index,
                 nftLifeIndex: nft_life_index,
+                distIndex:dist_index,
                 nftPowerIndex: nft_power_index,
                 nftCharacterId: nft_character_id,
                 publicKey: public_key
@@ -67,7 +70,7 @@ contract DAT {
         uint256 nft_life_index, 
         uint256 nft_power_index,
         string memory nft_character_id, 
-        bytes32 public_key){
+        bytes  memory public_key){
         require(_exists(token_id));
         NFT memory nft = _tokenInfo[token_id];
         return (nft.nftType,nft.nftName,nft.nftLdefIndex,nft.nftLifeIndex,nft.nftPowerIndex,nft.nftCharacterId,nft.publicKey);
